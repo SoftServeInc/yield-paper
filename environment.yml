@@ -1,0 +1,21 @@
+name: yield-paper
+channels:
+  - rdkit
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.6
+  - hyperopt
+  - numpy
+  - pandas
+  - rdkit=2018.03.4.0
+  - tensorboardX
+  - pytorch
+  - torchvision
+  - tqdm
+  - scikit-learn
+  - scipy
+  - pip
+  - pip:
+      - "--editable=git+https://github.com/bp-kelley/descriptastorus"
+      - epam.indigo=1.4.3
