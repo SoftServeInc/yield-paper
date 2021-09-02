@@ -9,5 +9,5 @@ Required packages are listed in environment.yml. Just run ```conda env create -f
 
 ## Authors
 - Dzvenymyra Yarish dyari@softserveinc.com
-- Sofia Garkot sgarkot@softserveinc.com
+- Sofiya Garkot sgark@softserveinc.com
 - Oleksandr Gurbych 
