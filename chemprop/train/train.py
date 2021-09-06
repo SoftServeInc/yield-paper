@@ -71,7 +71,7 @@ def train(model: nn.Module,
         model.zero_grad()
         if args.reaction:
             rbatch, pbatch = list(zip(*batch))
-            preds, _ = model(rbatch, pbatch, features_batch)
+            preds, _, _, _ = model(rbatch, pbatch, features_batch)
         else:
             preds = model(batch, features_batch)
 

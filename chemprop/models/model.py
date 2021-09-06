@@ -1,6 +1,6 @@
 from argparse import Namespace
 from typing import List, Union
-
+from copy import deepcopy
 import torch
 import torch.nn as nn
 import numpy as np
@@ -75,12 +75,14 @@ class Model(nn.Module):
                 ])
             ffn.extend([
                 activation,
-                dropout,
-                nn.Linear(args.ffn_hidden_size, args.output_size),
+                # dropout,
+                # nn.Linear(args.ffn_hidden_size, args.output_size),
             ])
 
         # Create FFN model
         self.ffn = nn.Sequential(*ffn)
+        ffn2 = [nn.Dropout(args.dropout), nn.Linear(args.ffn_hidden_size, args.output_size)]
+        self.ffn2 = nn.Sequential(*ffn2)
 
     def forward(self, *input):
         """
@@ -183,17 +185,22 @@ class ReactionModel(Model):
 
         diff_features = p_atom_features - r_atom_features
 
-        output, num_not_zero_diff = self.diff_encoder(diff_features, pbatch, features_batch)
+        output, num_not_zero_diff, middle = self.diff_encoder(diff_features, pbatch, features_batch)
+
         output = self.ffn(output)  # use product graph
+        after_diff_encoder_layer = output.detach().data.cpu().numpy()
+        output = self.ffn2(output)
         # Don't apply sigmoid during training b/c using BCEWithLogitsLoss
         if self.classification and not self.training:
             output = self.sigmoid(output)
         if self.multiclass:
-            output = output.reshape((output.size(0), -1, self.num_classes))  # batch size x num targets x num classes per target
+            output = output.reshape(
+                (output.size(0), -1, self.num_classes))  # batch size x num targets x num classes per target
             if not self.training:
-                output = self.multiclass_softmax(output)  # to get probabilities during evaluation, but not during training as we're using CrossEntropyLoss
+                output = self.multiclass_softmax(
+                    output)  # to get probabilities during evaluation, but not during training as we're using CrossEntropyLoss
 
-        return output, num_not_zero_diff
+        return output, num_not_zero_diff, middle, after_diff_encoder_layer
 
 
 def build_model(args: Namespace) -> nn.Module:

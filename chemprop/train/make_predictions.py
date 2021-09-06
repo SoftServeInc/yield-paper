@@ -71,7 +71,7 @@ def make_predictions(args: Namespace, smiles: List[str] = None) -> List[Optional
     for checkpoint_path in tqdm(args.checkpoint_paths, total=len(args.checkpoint_paths)):
         # Load model
         model = load_checkpoint(checkpoint_path, cuda=args.cuda, current_args=args)
-        model_preds, num_not_zero_atoms = predict(
+        model_preds, num_not_zero_atoms, middle_layer_representations, last_layer = predict(
             model=model,
             data=test_data,
             batch_size=args.batch_size,
@@ -154,4 +154,70 @@ def make_predictions(args: Namespace, smiles: List[str] = None) -> List[Optional
             row.append(num_not_zero_atoms[i]) if num_not_zero_atoms else row.append('')
             writer.writerow(row)
 
-    return avg_preds
+    if args.middle_representation_path:
+        with open(args.middle_representation_path, 'w') as f:
+            writer = csv.writer(f)
+
+            header = []
+
+            if args.use_compound_names:
+                header.append('compound_names')
+
+            if args.reaction:
+                header.extend(['rsmiles', 'psmiles'])
+            else:
+                header.append('smiles')
+
+            for i in range(len(middle_layer_representations[0])):
+                header.append('entry_no_' + str(i))
+
+            writer.writerow(header)
+            for i in range(len(middle_layer_representations)):
+                row = []
+
+                if args.use_compound_names:
+                    row.append(compound_names[i])
+
+                if args.reaction:
+                    row.extend(test_smiles[i])
+                else:
+                    row.append(test_smiles[i])
+
+                row.extend(middle_layer_representations[i])
+
+                writer.writerow(row)
+
+    if args.last_ffn_representation_path:
+        with open(args.last_ffn_representation_path, 'w') as f:
+            writer = csv.writer(f)
+
+            header = []
+
+            if args.use_compound_names:
+                header.append('compound_names')
+
+            if args.reaction:
+                header.extend(['rsmiles', 'psmiles'])
+            else:
+                header.append('smiles')
+
+            for i in range(len(last_layer[0])):
+                header.append('entry_no_' + str(i))
+
+            writer.writerow(header)
+            for i in range(len(last_layer)):
+                row = []
+
+                if args.use_compound_names:
+                    row.append(compound_names[i])
+
+                if args.reaction:
+                    row.extend(test_smiles[i])
+                else:
+                    row.append(test_smiles[i])
+
+                row.extend(last_layer[i])
+
+                writer.writerow(row)
+
+    return avg_preds, middle_layer_representations, last_layer

@@ -19,6 +19,10 @@ def add_predict_args(parser: ArgumentParser):
     parser.add_argument('--gpu', type=int,
                         choices=list(range(torch.cuda.device_count())),
                         help='Which GPU to use')
+    parser.add_argument('--middle_representation_path', type=str,
+                        help='Path to CSV file where representations of the middle layer will be saved')
+    parser.add_argument('--last_ffn_representation_path', type=str,
+                        help='Path to CSV file where representations of the last fully connected layer will be saved')
     parser.add_argument('--test_path', type=str,
                         help='Path to CSV file containing testing data for which predictions will be made')
     parser.add_argument('--use_compound_names', action='store_true', default=False,

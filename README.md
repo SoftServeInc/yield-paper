@@ -4,6 +4,7 @@ This repo contains supplementary code for our paper *Graph neural networks for e
 
 We provide preprocessing and atom mapping code for open datasets as well as scripts used for training. Graph neural network code in ```chemprop/``` dir is taken from https://github.com/chemprop/chemprop with some very minor modifications.
 
+We also added a possibility to apply dimensionality reduction(t-sne) to the middle graph representations and the final mixed (graph and rdkit descriptors) representations learned by graph neural net. Example visualizations can be found in ```clustering/``` .
 ## Installation
 Required packages are listed in environment.yml. Just run ```conda env create -f environment.yml ``` 
 
