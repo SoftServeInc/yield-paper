@@ -27,6 +27,9 @@ def predict(model: nn.Module,
 
     preds = []
 
+    last_layers = []
+    middle_layer_representations = []
+
     num_changed_atoms = []
 
     num_iters, iter_step = len(data), batch_size
@@ -43,7 +46,11 @@ def predict(model: nn.Module,
         with torch.no_grad():
             if isinstance(data, ReactionDataset):
                 rbatch, pbatch = list(zip(*batch))
-                batch_preds, num_not_zero_diff = model(rbatch, pbatch, features_batch)
+                batch_preds, num_not_zero_diff, middle_layer_representation, last_layer = model(rbatch, pbatch,
+                                                                                                features_batch)
+                middle_layer_representation = middle_layer_representation.tolist()
+                last_layer = last_layer.tolist()
+
 
             else:
                 batch_preds = model(batch, features_batch)
@@ -61,6 +68,7 @@ def predict(model: nn.Module,
 
             changed_atoms = np.array([c[0] for c in num_not_zero_diff])
             num_changed_atoms.extend(changed_atoms.tolist())
+            middle_layer_representations.extend(middle_layer_representation)
+            last_layers.extend(last_layer)
 
-
-    return preds, num_changed_atoms
+    return preds, num_changed_atoms, middle_layer_representations, last_layers

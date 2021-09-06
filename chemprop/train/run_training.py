@@ -251,7 +251,7 @@ def run_training(args: Namespace, logger: Logger = None) -> List[float]:
         info(f'Model {model_idx} best validation {args.metric} = {best_score:.6f} on epoch {best_epoch}')
         model = load_checkpoint(os.path.join(save_dir, 'model.pt'), cuda=args.cuda, logger=logger)
         
-        test_preds, samples_indices_to_eval = predict(
+        test_preds, _, _, _ = predict(
             model=model,
             data=test_data,
             batch_size=args.batch_size,

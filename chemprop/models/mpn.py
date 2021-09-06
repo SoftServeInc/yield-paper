@@ -110,7 +110,8 @@ class MPNEncoder(nn.Module):
             if self.atom_messages:
                 nei_a_message = index_select_ND(message, a2a)  # num_atoms x max_num_bonds x hidden
                 nei_f_bonds = index_select_ND(f_bonds, a2b)  # num_atoms x max_num_bonds x bond_fdim
-                nei_message = torch.cat((nei_a_message, nei_f_bonds), dim=2)  # num_atoms x max_num_bonds x hidden + bond_fdim
+                nei_message = torch.cat((nei_a_message, nei_f_bonds),
+                                        dim=2)  # num_atoms x max_num_bonds x hidden + bond_fdim
                 message = nei_message.sum(dim=1)  # num_atoms x hidden + bond_fdim
             else:
                 # m(a1 -> a2) = [sum_{a0 \in nei(a1)} m(a0 -> a1)] - m(a2 -> a1)
@@ -138,7 +139,6 @@ class MPNEncoder(nn.Module):
         mol_vecs = []
         for i, (a_start, a_size) in enumerate(a_scope):
             if a_size == 0:
-                print('add cached zero vec')
                 mol_vecs.append(self.cached_zero_vector)
             else:
                 cur_hiddens = atom_hiddens.narrow(0, a_start, a_size)
@@ -148,11 +148,11 @@ class MPNEncoder(nn.Module):
                 mol_vecs.append(mol_vec)
 
         mol_vecs = torch.stack(mol_vecs, dim=0)  # (num_molecules, hidden_size)
-        
+
         if self.use_input_features:
             features_batch = features_batch.to(mol_vecs)
             if len(features_batch.shape) == 1:
-                features_batch = features_batch.view([1,features_batch.shape[0]])
+                features_batch = features_batch.view([1, features_batch.shape[0]])
             mol_vecs = torch.cat([mol_vecs, features_batch], dim=1)  # (num_molecules, hidden_size)
 
         return mol_vecs  # num_molecules x hidden
@@ -227,7 +227,6 @@ class MPNDiffEncoder(nn.Module):
             af = atom_features.narrow(0, a_start, a_size)
             num_not_zero_diff.append([torch.sum((torch.sum(af, dim=1) > 0)).item(), a_size])
 
-
         # Input
         input = self.W_i(atom_features)  # num_atoms x atom_fdim
         message = self.act_func(input)  # num_atoms x hidden_size
@@ -242,7 +241,8 @@ class MPNDiffEncoder(nn.Module):
                 # but we only want the pure bond features here
                 nei_f_bonds = nei_f_bonds[:, :, -self.bond_fdim:]
 
-                nei_message = torch.cat((nei_a_message, nei_f_bonds), dim=2)  # num_atoms x max_num_bonds x hidden + bond_fdim
+                nei_message = torch.cat((nei_a_message, nei_f_bonds),
+                                        dim=2)  # num_atoms x max_num_bonds x hidden + bond_fdim
                 message = nei_message.sum(dim=1)  # num_atoms x hidden + bond_fdim
 
                 message = self.W_h(message)
@@ -270,8 +270,7 @@ class MPNDiffEncoder(nn.Module):
                 vecs.append(mol_vec)
 
         vecs = torch.stack(vecs, dim=0)  # (num_samples, hidden_size)
-        # middle_layer = deepcopy(vecs)
-
+        middle_layer = vecs.detach().data.cpu().numpy()
 
         if self.use_input_features:
             features_batch = features_batch.to(vecs)
@@ -279,7 +278,7 @@ class MPNDiffEncoder(nn.Module):
                 features_batch = features_batch.view([1, features_batch.shape[0]])
             vecs = torch.cat([vecs, features_batch], dim=1)  # (num_samples, hidden_size)
 
-        return vecs,  num_not_zero_diff, #middle_layer  # num_samples x hidden
+        return vecs, num_not_zero_diff, middle_layer  # num_samples x hidden
 
 
 class MPN(nn.Module):
