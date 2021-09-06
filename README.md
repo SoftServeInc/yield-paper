@@ -5,7 +5,7 @@ This repo contains supplementary code for our paper *Graph neural networks for e
 We provide preprocessing and atom mapping code for open datasets as well as scripts used for training. Graph neural network code in ```chemprop/``` dir is taken from https://github.com/chemprop/chemprop with some very minor modifications.
 
 ## Installation
-Required packages are listed in requirements.txt. Just run ```pip install -r requirements.txt ``` 
+Required packages are listed in environment.yml. Just run ```conda env create -f environment.yml ``` 
 
 ## Authors
 - Dzvenymyra Yarish dyari@softserveinc.com
