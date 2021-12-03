@@ -10,7 +10,7 @@ We also added a possibility to apply dimensionality reduction(t-sne) to the midd
 Required packages are listed in environment.yml. Just run ```conda env create -f environment.yml ``` 
 
 ## To reproduce
-For single reaction clas datasets:
+For single reaction class datasets:
 1. Run ```single_reaction_class_data_preprocessing.ipynb```
 2. Run ``` bash train_k_fold.sh```
 
