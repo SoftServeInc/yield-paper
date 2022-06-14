@@ -167,7 +167,7 @@ def get_loss_func(args: Namespace) -> nn.Module:
         return nn.BCEWithLogitsLoss(reduction='none')
 
     if args.dataset_type == 'regression':
-        return nn.L1Loss(reduction='none')
+        return nn.L2Loss(reduction='none')
     
     if args.dataset_type == 'multiclass':
         return nn.CrossEntropyLoss(reduction='none')

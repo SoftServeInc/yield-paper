@@ -1,4 +1,5 @@
-"""Trains a model on a dataset."""
+"""Entrypoint fot training."""
+"""Single or cross-validation training"""
 
 from chemprop.parsing import parse_train_args
 from chemprop.train import cross_validate
